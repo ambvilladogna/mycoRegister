@@ -1,0 +1,22 @@
+# nginx environment variables for mycoRegister
+
+# Public hostname, without protocol or trailing slash
+NGINX_SERVER_NAME=mycoregister.your_domain.com
+
+# Document root for the built PWA
+NGINX_WEB_ROOT=/var/www/html
+
+# TLS certificate paths (certificate may be public; private key must not be committed)
+NGINX_TLS_CERT=/etc/ssl/yourCertificate.pem
+NGINX_TLS_KEY=/etc/ssl/yourKey.pem
+
+# Log paths
+NGINX_ACCESS_LOG=/var/log/nginx/mycoregister_access.log
+NGINX_ERROR_LOG=/var/log/nginx/mycoregister_error.log
+
+# Local upstream services
+NGINX_API_UPSTREAM=http://your_node_host:your_node_app_port
+NGINX_COUCHDB_UPSTREAM=http://your_db_host:your_db_port
+
+# The single CouchDB database exposed through /db/
+NGINX_COUCHDB_DB_NAME=your_db_name
