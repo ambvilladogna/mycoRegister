@@ -49,7 +49,7 @@ async function initializeApp() {
         // Initialize components
         Header.init();
         console.log('Header initialized');
-        Footer.init({ connectionService, authEvents, authService, dbService });
+        Footer.init({ connectionService, authEvents, authService, dbService, dbCrud });
         console.log('Footer initialized');
         loginComponent.init();
         console.log('Login component initialized');

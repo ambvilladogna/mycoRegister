@@ -14,8 +14,7 @@ const listSpeciesModal = {
 
   // Hook for autocomplete values - to be implemented
   getLocalityAutocomplete: async function () {
-    const db = this.db.getLocalDatabase();
-    const result = await db.find({
+    const result = await this.db.find({
       selector: { type: 'fungiSample' },
       fields: ['locality']
     });
@@ -24,8 +23,7 @@ const listSpeciesModal = {
   },
 
   getCollectorAutocomplete: async function () {
-    const db = this.db.getLocalDatabase();
-    const result = await db.find({
+    const result = await this.db.find({
       selector: { type: 'fungiSample' },
       fields: ['collector']
     });
@@ -74,8 +72,7 @@ const listSpeciesModal = {
 
   executeQuery: async function (queryString) {
     // console.log('Executing query:', queryString);
-    const db = this.db.getLocalDatabase();
-    const result = await db.find({
+    const result = await this.db.find({
       selector: queryString.selector,
       fields: ['taxonGenus', 'taxonSpecies', 'authority', 'localityCoordinates']
     });
@@ -89,8 +86,7 @@ const listSpeciesModal = {
 
   getDetails: async function (genus, species) {
     try {
-      const db = this.db.getLocalDatabase();
-      const result = await db.find({
+      const result = await this.db.find({
         selector: {
           type: 'census',
           taxonGenus: genus,
@@ -663,8 +659,8 @@ const listSpeciesModal = {
     return R * c;
   },
 
-  init: async function (dbService) {
-    this.db = dbService;
+  init: async function (dbCrud) {
+    this.db = dbCrud;
     const self = this;
     this.modal = ModalUtils.create('Estrai elenco specie', function (modalBody) {
       modalBody.innerHTML = `
@@ -831,8 +827,8 @@ const listSpeciesModal = {
     });
   },
 
-  show: async function (session, dbService) {
-    if (!this.modal) await this.init(dbService);
+  show: async function (dbCrud) {
+    if (!this.modal) await this.init(dbCrud);
     this.modal.show();
   }
 };

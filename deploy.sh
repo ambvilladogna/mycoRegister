@@ -6,6 +6,7 @@ DEV_BRANCH="dev"
 RELEASE_BRANCH="master"
 PROD_REMOTE="production"
 ORIGIN_REMOTE="origin"
+ORIGIN_GITHUB="github"
 # Optional: purge only these URLs instead of everything (space-separated), e.g.
 # PURGE_URLS="https://example.com/sw.js https://example.com/index.html"
 PURGE_URLS="${PURGE_URLS:-}"
@@ -76,39 +77,27 @@ fi
 #         || die "Local $DEV_BRANCH is behind or diverged from $ORIGIN_REMOTE/$DEV_BRANCH. Pull/rebase first."
 # fi
 
-# --- 1. Generate version ---------------------------------------------------------
-log "1. Generating app version file..."
-node scripts/generateVersion.js || die "Version file generation failed."
-
-# --- 2. Commit on dev (only if something changed) --------------------------------
-log "2. Staging generated and updated files..."
-git add public/js/components/footer.js public/sw.js
-if git diff --cached --quiet; then
-    log "   No version changes to commit, continuing."
-else
-    git commit -m "Build: Incorporate app version $(git describe --tags --always)"
-fi
-
-# --- 3. Merge dev into master ----------------------------------------------------
-log "3. Merging $DEV_BRANCH into $RELEASE_BRANCH..."
+# --- 1. Merge dev into master ----------------------------------------------------
+log "1. Merging $DEV_BRANCH into $RELEASE_BRANCH..."
 git checkout "$RELEASE_BRANCH"
 MASTER_SHA=$(git rev-parse HEAD)
 MERGED=1
 git merge "$DEV_BRANCH" --no-ff -m "Merge branch '$DEV_BRANCH' into $RELEASE_BRANCH for release"
 
-# --- 4. Push to production -------------------------------------------------------
-log "4. Pushing $RELEASE_BRANCH to $PROD_REMOTE..."
+# --- 2. Push to production -------------------------------------------------------
+log "2. Pushing $RELEASE_BRANCH to $PROD_REMOTE..."
 git push "$PROD_REMOTE" "$RELEASE_BRANCH"
 PUSHED=1
 
-# --- 5. Back to dev, sync remotes (non-fatal: production is already updated) -----
-log "5. Syncing remote branches..."
+# --- 3. Back to dev, sync remotes (non-fatal: production is already updated) -----
+log "3. Syncing remote branches..."
 git checkout "$DEV_BRANCH"
 git push "$ORIGIN_REMOTE" "$DEV_BRANCH"     || warn "Failed to push $DEV_BRANCH to $ORIGIN_REMOTE."
 git push "$ORIGIN_REMOTE" "$RELEASE_BRANCH" || warn "Failed to push $RELEASE_BRANCH to $ORIGIN_REMOTE."
+git push "$ORIGIN_GITHUB" "$RELEASE_BRANCH" || warn "Failed to push $RELEASE_BRANCH to $ORIGIN_GITHUB."
 
-# --- 6. Purge Cloudflare cache ---------------------------------------------------
-log "6. Cleaning Cloudflare cache..."
+# --- 4. Purge Cloudflare cache ---------------------------------------------------
+log "4. Cleaning Cloudflare cache..."
 if [ -n "$PURGE_URLS" ]; then
     FILES_JSON=$(printf '%s\n' $PURGE_URLS | sed 's/.*/"&"/' | paste -sd, -)
     PAYLOAD="{\"files\":[${FILES_JSON}]}"

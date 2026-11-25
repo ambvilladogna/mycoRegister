@@ -227,8 +227,7 @@ class FungiService {
       // Query database with date/type conditions only
       const result = await this.dbCrud.find({
         selector,
-        sort: sort,
-        limit: 999999 // Get all matching documents for filtering
+        sort: sort
       });
 
       if (result.warning) console.warn('Search warnings:', result.warning);

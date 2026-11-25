@@ -8,9 +8,9 @@ import { spinner } from './spinner.js';
 // The following line is modified by the build process.
 const version = __APP_VERSION__;
 
-async function showUserProfile(authService, connectionService, dbService) {
+async function showUserProfile(authService, connectionService, dbService, dbCrud) {
   const { userProfileModal } = await import('./userProfileModal.js');
-  userProfileModal.show(authService, connectionService, dbService);
+  userProfileModal.show(authService, connectionService, dbService, dbCrud);
 }
 
 const Footer = {
@@ -20,6 +20,7 @@ const Footer = {
     const authEvents = config.authEvents;
     const authService = config.authService;
     const dbService = config.dbService;
+    const dbCrud = config.dbCrud;
     const footerContainer = document.getElementById('footer-container');
     if (!footerContainer) return;
 
@@ -61,7 +62,7 @@ const Footer = {
     this.initConnectionStatus(connectionService);
     this.initSyncStatus(dbService);
     this.initSyncOffline(authService, authEvents);
-    this.initUserProfileBtn(authService, authEvents, connectionService, dbService);
+    this.initUserProfileBtn(authService, authEvents, connectionService, dbService, dbCrud);
   },
 
   initConnectionStatus: function (connectionService) {
@@ -153,10 +154,10 @@ const Footer = {
     });
   },
 
-  initUserProfileBtn: function (authService, authEvents, connectionService, dbService) {
+  initUserProfileBtn: function (authService, authEvents, connectionService, dbService, dbCrud) {
     const userProfileBtn = document.getElementById('user-profile-btn');
     userProfileBtn.style.display = "none";
-    userProfileBtn.addEventListener('click', () => showUserProfile(authService, connectionService, dbService));
+    userProfileBtn.addEventListener('click', () => showUserProfile(authService, connectionService, dbService, dbCrud));
 
     if (authService.isAuthenticated()) {
       authService.getSessionInfo().then(session => {

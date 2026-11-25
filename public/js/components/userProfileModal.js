@@ -9,7 +9,7 @@ const userProfileModal = {
     this.modal = null;
   },
 
-  init: async function (authService, connectionService, dbService) {
+  init: async function (authService, connectionService, dbService, dbCrud) {
     const session = await authService.getSessionInfo();
     const self = this;
     this.modal = ModalUtils.create('Profilo utente', function (modalBody) {
@@ -42,7 +42,7 @@ const userProfileModal = {
         const listSpeciesdBtn = modalBody.querySelector('#list-species-btn');
         if (listSpeciesdBtn) {
           listSpeciesdBtn.addEventListener('click', async () => {
-            listSpeciesModal.show(session, dbService);
+            listSpeciesModal.show(dbCrud);
           });
         }
         const changePasswordBtn = modalBody.querySelector('#change-password-btn');
@@ -128,8 +128,8 @@ const userProfileModal = {
     });
   },
 
-  show: async function (authService, connectionService, dbService) {
-    if (!this.modal) await this.init(authService, connectionService, dbService);
+  show: async function (authService, connectionService, dbService, dbCrud) {
+    if (!this.modal) await this.init(authService, connectionService, dbService, dbCrud);
     this.modal.show();
   }
 };

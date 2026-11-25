@@ -1,6 +1,7 @@
 // CRUD methods for local PouchDB operations
 
 // uses /js/services/dbService.js';
+const NO_LIMIT = 4294967295; // PouchDB 9 default is 25; limit is a uint32
 
 class DbCrud {
     constructor(config) {
@@ -113,7 +114,7 @@ class DbCrud {
         try {
             const db = this.getLocalDb();
             // console.log('Finding documents with query:', JSON.stringify(query, null, 2));
-            const result = await db.find(query);
+            const result = await db.find({ limit: NO_LIMIT, ...query });
             return result;
         } catch (error) {
             console.error('Error finding documents:', error);
@@ -142,6 +143,7 @@ class DbCrud {
         try {
             const db = this.getLocalDb();
             const result = await db.find({
+                limit: NO_LIMIT,
                 selector: { type: type }
             });
 
@@ -173,7 +175,7 @@ class DbCrud {
                 skip: (page - 1) * limit
             };
 
-            const result = await db.find(paginatedQuery);
+            const result = await db.find({ limit: NO_LIMIT, ...paginatedQuery });
             return result;
         } catch (error) {
             console.error('Error querying documents with pagination:', error);
