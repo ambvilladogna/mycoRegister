@@ -7,7 +7,7 @@
         "setup": "npm install",
         "build": "node scripts/build.js",
         "start": "npm run build && node --enable-source-maps dist/server/server.js",
-        "dev": "nodemon --watch server --watch public --ext js,json,html,css --exec \"node scripts/build.js && node --enable-source-maps dist/server/server.js\""
+        "dev": "nodemon -L --polling-interval 1000 --watch server --watch public --ext js,json,html,css --exec \"node scripts/build.js && node --enable-source-maps dist/server/server.js\""
     },
     "dependencies": {
         "bcryptjs": "^3.0.2",
