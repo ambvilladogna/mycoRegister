@@ -77,27 +77,33 @@ fi
 #         || die "Local $DEV_BRANCH is behind or diverged from $ORIGIN_REMOTE/$DEV_BRANCH. Pull/rebase first."
 # fi
 
-# --- 1. Merge dev into master ----------------------------------------------------
-log "1. Merging $DEV_BRANCH into $RELEASE_BRANCH..."
+# --- 1. Syncing tags with remotes ------------------------------------------------
+log "1. Syncing tags with remotes..."
+git push --tags "$ORIGIN_REMOTE" "$DEV_BRANCH"     || warn "Failed to push --tags$DEV_BRANCH to $ORIGIN_REMOTE."
+git push --tags "$ORIGIN_REMOTE" "$RELEASE_BRANCH" || warn "Failed to push --tags$RELEASE_BRANCH to $ORIGIN_REMOTE."
+git push --tags "$ORIGIN_GITHUB" "$RELEASE_BRANCH" || warn "Failed to push --tags$RELEASE_BRANCH to $ORIGIN_GITHUB."
+
+# --- 2. Merge dev into master ----------------------------------------------------
+log "2. Merging $DEV_BRANCH into $RELEASE_BRANCH..."
 git checkout "$RELEASE_BRANCH"
 MASTER_SHA=$(git rev-parse HEAD)
 MERGED=1
 git merge "$DEV_BRANCH" --no-ff -m "Merge branch '$DEV_BRANCH' into $RELEASE_BRANCH for release"
 
-# --- 2. Push to production -------------------------------------------------------
-log "2. Pushing $RELEASE_BRANCH to $PROD_REMOTE..."
+# --- 3. Push to production -------------------------------------------------------
+log "3. Pushing $RELEASE_BRANCH to $PROD_REMOTE..."
 git push "$PROD_REMOTE" "$RELEASE_BRANCH"
 PUSHED=1
 
-# --- 3. Back to dev, sync remotes (non-fatal: production is already updated) -----
-log "3. Syncing remote branches..."
+# --- 4. Back to dev, sync remotes (non-fatal: production is already updated) -----
+log "4. Syncing remote branches..."
 git checkout "$DEV_BRANCH"
 git push "$ORIGIN_REMOTE" "$DEV_BRANCH"     || warn "Failed to push $DEV_BRANCH to $ORIGIN_REMOTE."
 git push "$ORIGIN_REMOTE" "$RELEASE_BRANCH" || warn "Failed to push $RELEASE_BRANCH to $ORIGIN_REMOTE."
 git push "$ORIGIN_GITHUB" "$RELEASE_BRANCH" || warn "Failed to push $RELEASE_BRANCH to $ORIGIN_GITHUB."
 
-# --- 4. Purge Cloudflare cache ---------------------------------------------------
-log "4. Cleaning Cloudflare cache..."
+# --- 5. Purge Cloudflare cache ---------------------------------------------------
+log "5. Cleaning Cloudflare cache..."
 if [ -n "$PURGE_URLS" ]; then
     FILES_JSON=$(printf '%s\n' $PURGE_URLS | sed 's/.*/"&"/' | paste -sd, -)
     PAYLOAD="{\"files\":[${FILES_JSON}]}"
